@@ -1,0 +1,28 @@
+.page {
+  margin: 20px;
+}
+
+.page input {
+  margin-bottom: 10px;
+  width: 300px;
+}
+
+.scroll {
+  height: 400px;
+  width: 300px;
+  overflow-y: scroll;
+}
+
+.item {
+  height: 40px;
+  box-sizing: border-box;
+  padding: 5px;
+}
+
+.item:nth-child(even) {
+  background-color: lightgreen;
+}
+
+.item:nth-child(odd) {
+  background-color: lightblue;
+}
