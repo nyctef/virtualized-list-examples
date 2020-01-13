@@ -4,22 +4,45 @@ import { storiesOf } from "@storybook/react";
 import "./styles.css";
 
 const VirtualizedList = props => {
-  const { numItems, renderItem } = props;
+  const { numItems, itemHeight, renderItem, windowHeight } = props;
+  const [scrollTop, setScrollTop] = useState(0);
+
+  const innerHeight = numItems * itemHeight;
+  const startIndex = Math.floor(scrollTop / itemHeight);
+  const endIndex = Math.min(
+    numItems - 1, // don't render past the end of the list
+    Math.floor((scrollTop + windowHeight) / itemHeight)
+  );
 
   const items = [];
-
-  for (let i = 0; i < numItems; i++) {
-    items.push(renderItem({ index: i }));
+  for (let i = startIndex; i <= endIndex; i++) {
+    items.push(
+      renderItem({
+        index: i,
+        style: {
+          position: "absolute",
+          top: `${i * itemHeight}px`,
+          width: "100%"
+        }
+      })
+    );
   }
 
+  const onScroll = e => setScrollTop(e.currentTarget.scrollTop);
+
   return (
-    <div className="scroll">
-      <div className="inner">{items}</div>
+    <div className="scroll" style={{ overflowY: "scroll" }} onScroll={onScroll}>
+      <div
+        className="inner"
+        style={{ position: "relative", height: `${innerHeight}px` }}
+      >
+        {items}
+      </div>
     </div>
   );
 };
 
-storiesOf("VirtualizedList", module).add("2: callback api", () => {
+storiesOf("VirtualizedList", module).add("3: virtualization", () => {
   const [count, setCount] = useState(1000);
   const [items, setItems] = useState([]);
 
@@ -50,10 +73,12 @@ storiesOf("VirtualizedList", module).add("2: callback api", () => {
       />
       <VirtualizedList
         numItems={items.length}
-        renderItem={({ index }) => {
+        itemHeight={40}
+        windowHeight={400}
+        renderItem={({ index, style }) => {
           const i = items[index];
           return (
-            <div key={i.name} className="item">
+            <div key={i.name} className="item" style={style}>
               <label>
                 <input
                   type="checkbox"
